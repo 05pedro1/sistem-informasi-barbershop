@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Pengelola - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-brand {
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
+        }
+        .sidebar-brand span { color: var(--accent-gold); }
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        .sidebar-menu li a {
+            display: block;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background-color: rgba(212, 175, 55, 0.15);
+            color: var(--accent-gold);
+            border-left: 4px solid var(--accent-gold);
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            background-color: var(--bg-primary);
+            overflow-y: auto;
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .card-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            text-align: left;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th { background-color: var(--bg-secondary); color: var(--text-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Kartu Ringkasan Laporan */
+        .report-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        @media (max-width: 768px) {
+            .report-cards { grid-template-columns: 1fr; }
+        }
+        .report-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .report-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        .report-card h3 {
+            font-size: 2rem;
+            color: var(--accent-gold);
+        }
+        
+        /* Form Filter & Input */
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .form-control {
+            padding: 0.6rem 0.85rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .action-link {
+            color: var(--accent-gold);
+            cursor: pointer;
+            text-decoration: underline;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigasi Admin -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                WALLA <span>PENGELOLA</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" onclick="switchTab('kelola-data', event)">✂️ Kelola Layanan & Barber</a></li>
+                <li><a href="#" onclick="switchTab('laporan', event)">📊 Halaman Laporan</a></li>
+                <li><a href="login.html" style="color: var(--danger); margin-top: 2rem;">🚪 Keluar</a></li>
+            </ul>
+        </div>
+
+        <!-- Konten Utama Pengelola -->
+        <div class="main-content">
+            
+            <!-- (a) BAGIAN KELOLA DATA LAYANAN DAN BARBER -->
+            <div id="kelola-data" class="tab-content active">
+                <div class="header-bar">
+                    <h2 style="font-size: 1.3rem;">KELOLA DATA</h2>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Layanan | Barber</span>
+                </div>
+
+                <!-- Bagian Kelola Layanan -->
+                <div class="card-box">
+                    <button onclick="addService()" class="btn btn-primary" style="margin-bottom: 1rem;">+ Tambah Layanan</button>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Layanan</th>
+                                    <th>Harga (min - max)</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicesTableBody">
+                                <!-- Dimuat via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bagian Kelola Barber -->
+                <div class="card-box">
+                    <button onclick="addBarber()" class="btn btn-primary" style="margin-bottom: 1rem;">+ Tambah Barber</button>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Barber</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="barbersTableBody">
+                                <!-- Dimuat via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- (b) BAGIAN HALAMAN LAPORAN -->
+            <div id="laporan" class="tab-content">
+                <div class="header-bar">
+                    <h2 style="font-size: 1.3rem;">LAPORAN</h2>
+                    <a href="login.html" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">Keluar</a>
+                </div>
+
+                <!-- Filter Tanggal Laporan -->
+                <div class="card-box" style="padding: 1.25rem;">
+                    <div class="filter-group">
+                        <label for="reportDate">Tanggal:</label>
+                        <input type="date" id="reportDate" class="form-control">
+                        <button onclick="filterReport()" class="btn btn-primary">Tampilkan</button>
+                    </div>
+                </div>
+
+                <!-- Kartu Rekapitulasi Laporan -->
+                <div class="report-cards">
+                    <div class="report-card">
+                        <p>Jumlah Pelanggan</p>
+                        <h3 id="repCustomers">0</h3>
+                    </div>
+                    <div class="report-card">
+                        <p>Jumlah Transaksi</p>
+                        <h3 id="repTransactions">0</h3>
+                    </div>
+                    <div class="report-card">
+                        <p>Total Pendapatan</p>
+                        <h3 id="repRevenue">Rp 0</h3>
+                    </div>
+                </div>
+
+                <!-- Tabel Rekap Transaksi Lunas -->
+                <div class="card-box">
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Pelanggan</th>
+                                    <th>Transaksi</th>
+                                    <th>Pendapatan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody">
+                                <!-- Dimuat via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                        * Rekap berdasarkan transaksi yang telah lunas
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Halaman Pengelola -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderServices();
+            renderBarbers();
+            initReportDate();
+            loadReports();
+        });
+
+        function switchTab(tabId, event) {
+            event.preventDefault();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- (a) LOGIKA KELOLA LAYANAN & BARBER ---
+        function renderServices() {
+            const services = JSON.parse(localStorage.getItem('walla_services')) || [];
+            const tbody = document.getElementById('servicesTableBody');
+
+            tbody.innerHTML = services.map((s, idx) => `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td>Rp ${s.price.toLocaleString('id-ID')}</td>
+                    <td><span style="color: ${s.status === 'Nonaktif' ? 'var(--danger)' : '#28a745'}; font-weight: 600;">${s.status || 'Aktif'}</span></td>
+                    <td>
+                        <span class="action-link" onclick="toggleServiceStatus(${idx})">
+                            ${s.status === 'Nonaktif' ? 'Aktifkan' : 'Nonaktifkan'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleServiceStatus(index) {
+            let services = JSON.parse(localStorage.getItem('walla_services')) || [];
+            services[index].status = services[index].status === 'Nonaktif' ? 'Aktif' : 'Nonaktif';
+            localStorage.setItem('walla_services', JSON.stringify(services));
+            renderServices();
+        }
+
+        function addService() {
+            const name = prompt("Masukkan nama layanan baru:");
+            const price = prompt("Masukkan harga layanan (contoh: 30000):");
+            if (name && price) {
+                let services = JSON.parse(localStorage.getItem('walla_services')) || [];
+                services.push({
+                    id: `SRV-${Date.now()}`,
+                    name: name,
+                    price: parseInt(price),
+                    duration: "30 menit",
+                    status: "Aktif",
+                    image: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=500&q=80",
+                    desc: "Layanan pangkas rambut kustom."
+                });
+                localStorage.setItem('walla_services', JSON.stringify(services));
+                renderServices();
+            }
+        }
+
+        function renderBarbers() {
+            const barbers = JSON.parse(localStorage.getItem('walla_barbers')) || [];
+            const tbody = document.getElementById('barbersTableBody');
+
+            tbody.innerHTML = barbers.map((b, idx) => `
+                <tr>
+                    <td><strong>${b.name}</strong></td>
+                    <td><span style="color: ${b.status === 'Nonaktif' ? 'var(--danger)' : '#28a745'}; font-weight: 600;">${b.status}</span></td>
+                    <td>
+                        <span class="action-link" onclick="toggleBarberStatus(${idx})">
+                            ${b.status === 'Nonaktif' ? 'Aktifkan' : 'Nonaktifkan'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleBarberStatus(index) {
+            let barbers = JSON.parse(localStorage.getItem('walla_barbers')) || [];
+            barbers[index].status = barbers[index].status === 'Nonaktif' ? 'Aktif' : 'Nonaktif';
+            localStorage.setItem('walla_barbers', JSON.stringify(barbers));
+            renderBarbers();
+        }
+
+        function addBarber() {
+            const name = prompt("Masukkan nama barber baru:");
+            if (name) {
+                let barbers = JSON.parse(localStorage.getItem('walla_barbers')) || [];
+                barbers.push({
+                    id: `BRB-${Date.now()}`,
+                    name: name,
+                    specialty: "Professional Barber",
+                    status: "Aktif"
+                });
+                localStorage.setItem('walla_barbers', JSON.stringify(barbers));
+                renderBarbers();
+            }
+        }
+
+        // --- (b) LOGIKA LAPORAN ---
+        function initReportDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
+        }
+
+        function loadReports() {
+            const transactions = JSON.parse(localStorage.getItem('walla_transactions')) || [];
+            const selectedDate = document.getElementById('reportDate').value;
+
+            // Filter transaksi lunas berdasarkan tanggal
+            const filtered = transactions.filter(t => t.date === selectedDate);
+
+            const totalCust = filtered.length;
+            const totalTrans = filtered.length;
+            const totalRev = filtered.reduce((sum, t) => sum + t.amount, 0);
+
+            document.getElementById('repCustomers').textContent = totalCust;
+            document.getElementById('repTransactions').textContent = totalTrans;
+            document.getElementById('repRevenue').textContent = `Rp ${totalRev.toLocaleString('id-ID')}`;
+
+            const tbody = document.getElementById('reportTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>${selectedDate || 'dd/mm/yyyy'}</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>Rp 0</td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td><strong>${selectedDate}</strong></td>
+                        <td>${totalCust} Pelanggan</td>
+                        <td>${totalTrans} Transaksi</td>
+                        <td style="color: var(--accent-gold); font-weight: bold;">Rp ${totalRev.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function filterReport() {
+            loadReports();
+        }
+    </script>
+</body>
+</html>

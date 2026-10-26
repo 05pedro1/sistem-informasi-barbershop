@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Barber - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .card-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .card-box h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+        th {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+        }
+        tr.selected {
+            background-color: rgba(212, 175, 55, 0.15) !important;
+            border-left: 4px solid var(--accent-gold);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-menunggu { background-color: #ffc107; color: #000; }
+        .badge-dipanggil { background-color: #17a2b8; color: #fff; }
+        .badge-dilayani { background-color: #28a745; color: #fff; }
+        .badge-selesai { background-color: #6c757d; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar Khusus Dashboard -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">DASHBOARD <span>BARBER</span></a>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Keluar</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="card-box">
+            <h3>Daftar Antrean Hari Ini</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Pelanggan</th>
+                            <th>Layanan</th>
+                            <th>Barber</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="barberQueueTable">
+                        <!-- Data antrean akan dimuat otomatis via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-box">
+            <h3>Perbarui status antrean terpilih:</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;" id="selectedInfo">Klik salah satu baris antrean di atas untuk memilih data.</p>
+            
+            <div class="action-buttons">
+                <button onclick="updateStatus('Dipanggil')" class="btn btn-outline" style="border-color: #17a2b8; color: #17a2b8;">Panggil</button>
+                <button onclick="updateStatus('Sedang Dilayani')" class="btn btn-outline" style="border-color: #28a745; color: #28a745;">Dilayani</button>
+                <button onclick="updateStatus('Selesai')" class="btn btn-primary">Selesai</button>
+                <button onclick="updateStatus('Dibatalkan')" class="btn btn-outline" style="border-color: #dc3545; color: #dc3545;">Batal / Terlewat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript untuk Dashboard Barber -->
+    <script>
+        let selectedQueueCode = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBarberQueue();
+        });
+
+        function loadBarberQueue() {
+            const tbody = document.getElementById('barberQueueTable');
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+
+            if (bookings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Belum ada antrean hari ini.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = bookings.map((item) => `
+                <tr onclick="selectRow('${item.code}', this)" id="row-${item.code}">
+                    <td><strong>${item.queueNumber}</strong></td>
+                    <td>${item.customerName}</td>
+                    <td>${item.serviceName}</td>
+                    <td>${item.barberName}</td>
+                    <td><span class="badge badge-${getStatusClass(item.status)}">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Menunggu': return 'menunggu';
+                case 'Dipanggil': return 'dipanggil';
+                case 'Sedang Dilayani': return 'dilayani';
+                case 'Selesai': return 'selesai';
+                default: return 'menunggu';
+            }
+        }
+
+        function selectRow(code, element) {
+            // Hapus seleksi sebelumnya
+            document.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected'));
+            
+            // Tandai baris terpilih
+            element.classList.add('selected');
+            selectedQueueCode = code;
+
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            const selected = bookings.find(b => b.code === code);
+            if (selected) {
+                document.getElementById('selectedInfo').textContent = `Terpilih: ${selected.queueNumber} - ${selected.customerName} (${selected.serviceName})`;
+            }
+        }
+
+        function updateStatus(newStatus) {
+            if (!selectedQueueCode) {
+                alert('Silakan klik dan pilih salah satu baris antrean terlebih dahulu pada tabel di atas!');
+                return;
+            }
+
+            let bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            const index = bookings.findIndex(b => b.code === selectedQueueCode);
+
+            if (index !== -1) {
+                bookings[index].status = newStatus;
+                
+                // Jika status selesai, tandai juga untuk siap dibayar di kasir
+                if (newStatus === 'Selesai') {
+                    bookings[index].paymentStatus = 'Belum Dibayar';
+                }
+
+                localStorage.setItem('walla_bookings', JSON.stringify(bookings));
+                alert(`Status antrean berhasil diperbarui menjadi: ${newStatus}`);
+                
+                selectedQueueCode = null;
+                document.getElementById('selectedInfo').textContent = 'Klik salah satu baris antrean di atas untuk memilih data.';
+                loadBarberQueue();
+            }
+        }
+    </script>
+</body>
+</html>

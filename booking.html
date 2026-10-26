@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Online - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .booking-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .form-control:focus {
+            outline: 1px solid var(--accent-gold);
+        }
+        .ticket-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .ticket-card {
+            background-color: var(--bg-card);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        .queue-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin: 1rem 0;
+            letter-spacing: 2px;
+        }
+        .ticket-details {
+            text-align: left;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .ticket-details div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">WALLA<span>BARBERSHOP</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="layanan.html">Layanan</a></li>
+                <li><a href="antrean.html">Antrean</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="booking.html" class="btn btn-primary active">Booking Sekarang</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Form Booking -->
+    <section class="container">
+        <div class="section-title">
+            <h2>Formulir Booking Antrean</h2>
+            <p>Isi data diri dan tentukan jadwal pangkas rambut Anda</p>
+        </div>
+
+        <div class="booking-container">
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="customerName">Nama Lengkap *</label>
+                    <input type="text" id="customerName" class="form-control" placeholder="Masukkan nama Anda" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerPhone">Nomor WhatsApp / Telepon *</label>
+                    <input type="tel" id="customerPhone" class="form-control" placeholder="Contoh: 08123456789" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceSelect">Pilih Layanan *</label>
+                    <select id="serviceSelect" class="form-control" required>
+                        <option value="">-- Pilih Layanan --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="barberSelect">Pilih Barber *</label>
+                    <select id="barberSelect" class="form-control" required>
+                        <option value="">-- Pilih Barber --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingDate">Tanggal Kedatangan *</label>
+                    <input type="date" id="bookingDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingTime">Jam Kedatangan *</label>
+                    <select id="bookingTime" class="form-control" required>
+                        <option value="">-- Pilih Sesi Jam --</option>
+                        <option value="10:00">10:00 WIB</option>
+                        <option value="11:00">11:00 WIB</option>
+                        <option value="13:00">13:00 WIB</option>
+                        <option value="14:00">14:00 WIB</option>
+                        <option value="15:00">15:00 WIB</option>
+                        <option value="16:00">16:00 WIB</option>
+                        <option value="17:00">17:00 WIB</option>
+                        <option value="19:00">19:00 WIB</option>
+                        <option value="20:00">20:00 WIB</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size: 1.1rem; margin-top: 1rem;">Konfirmasi & Ambil Nomor Antrean</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Modal Tiket Antrean (Muncul Setelah Booking Berhasil) -->
+    <div class="ticket-modal" id="ticketModal">
+        <div class="ticket-card">
+            <h3>WALLA BARBERSHOP</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Bukti Antrean & Booking Online</p>
+            
+            <div class="queue-number" id="ticketQueueNum">A-000</div>
+
+            <div class="ticket-details">
+                <div><span>Kode Booking:</span> <strong id="ticketCode">-</strong></div>
+                <div><span>Nama:</span> <strong id="ticketName">-</strong></div>
+                <div><span>Layanan:</span> <strong id="ticketService">-</strong></div>
+                <div><span>Barber:</span> <strong id="ticketBarber">-</strong></div>
+                <div><span>Tanggal:</span> <strong id="ticketDate">-</strong></div>
+                <div><span>Jam:</span> <strong id="ticketTime">-</strong></div>
+                <div><span>Harga:</span> <strong id="ticketPrice" style="color: var(--accent-gold);">-</strong></div>
+                <div><span>Status:</span> <span style="color: var(--accent-gold); font-weight: bold;">Menunggu</span></div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                <a href="antrean.html" class="btn btn-primary">Pantau Antrean</a>
+                <button onclick="closeModal()" class="btn btn-outline">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container" style="padding: 0;">
+            <h3>WALLA BARBERSHOP</h3>
+            <p>Jl. Melati No. 45, Kota Situbondo | Telepon: 0812-3456-7890</p>
+            <p>&copy; 2026 WALLA BARBERSHOP. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/data.js"></script>
+    <script src="js/booking.js"></script>
+</body>
+</html>

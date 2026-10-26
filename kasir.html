@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kasir - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .card-box h3 {
+            margin-bottom: 1.25rem;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        .form-control:focus {
+            outline: 1px solid var(--accent-gold);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        th {
+            background-color: var(--bg-secondary);
+        }
+        tr.clickable:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+        }
+        tr.selected {
+            background-color: rgba(212, 175, 55, 0.15) !important;
+            border-left: 3px solid var(--accent-gold);
+        }
+        .payment-box {
+            background-color: var(--bg-secondary);
+            border: 1px dashed var(--accent-gold);
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .radio-group label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar Kasir -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">DASHBOARD <span>KASIR</span></a>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Keluar</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- BARIS ATAS: (c) Input Antrean Langsung & Daftar Antrean Gabungan -->
+        <div class="grid-2">
+            <!-- Form Input Antrean Langsung -->
+            <div class="card-box">
+                <h3>Input Antrean Langsung</h3>
+                <form id="directQueueForm">
+                    <div class="form-group">
+                        <label for="directName">Nama Pelanggan *</label>
+                        <input type="text" id="directName" class="form-control" placeholder="Nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="directPhone">Nomor HP *</label>
+                        <input type="tel" id="directPhone" class="form-control" placeholder="08xxxxxxxxxx" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="directService">Layanan *</label>
+                        <select id="directService" class="form-control" required>
+                            <option value="">-- Pilih Layanan --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="directBarber">Barber *</label>
+                        <select id="directBarber" class="form-control" required>
+                            <option value="">-- Pilih Barber --</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Buat Antrean Langsung</button>
+                </form>
+            </div>
+
+            <!-- Tabel Antrean Hari Ini (Gabungan Online & Langsung) -->
+            <div class="card-box">
+                <h3>Antrean Hari Ini (Gabungan)</h3>
+                <div style="max-height: 280px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Pelanggan</th>
+                                <th>Jenis</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="combinedQueueTable">
+                            <!-- Dimuat via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">Online dan Langsung dalam satu urutan.</p>
+            </div>
+        </div>
+
+        <!-- BARIS BAWAH: (d) Halaman / Bagian Pembayaran -->
+        <div class="grid-2">
+            <!-- Tabel Antrean Selesai Dilayani -->
+            <div class="card-box">
+                <h3>Antrean Selesai Dilayani</h3>
+                <div style="max-height: 250px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Pelanggan</th>
+                                <th>Layanan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completedQueueTable">
+                            <!-- Dimuat via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Form/Panel Pembayaran -->
+            <div class="card-box">
+                <h3>Formulir Pembayaran</h3>
+                <div id="paymentDetails" style="color: var(--text-muted); font-size: 0.95rem;">
+                    Pilih salah satu antrean yang selesai dilayani pada tabel di samping untuk diproses pembayarannya.
+                </div>
+
+                <div class="payment-box" id="paymentActionBox" style="display: none;">
+                    <p style="font-size: 1.1rem; font-weight: bold; color: var(--text-primary);">
+                        Jumlah Tagihan: <span id="billAmount" style="color: var(--accent-gold);">Rp 0</span>
+                    </p>
+                    
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Metode Pembayaran:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="paymentMethod" value="Cash" checked> Cash (Tunai)</label>
+                            <label><input type="radio" name="paymentMethod" value="QRIS"> QRIS</label>
+                        </div>
+                    </div>
+
+                    <button onclick="processPayment()" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Simpan Transaksi & Cetak Struk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Kasir -->
+    <script>
+        let selectedPaymentCode = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDropdowns();
+            loadCombinedQueue();
+            loadCompletedQueue();
+
+            document.getElementById('directQueueForm').addEventListener('submit', handleDirectQueue);
+        });
+
+        function loadDropdowns() {
+            const services = JSON.parse(localStorage.getItem('walla_services')) || [];
+            const barbers = JSON.parse(localStorage.getItem('walla_barbers')) || [];
+
+            const sSelect = document.getElementById('directService');
+            const bSelect = document.getElementById('directBarber');
+
+            services.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `${s.name} (Rp ${s.price.toLocaleString('id-ID')})`;
+                sSelect.appendChild(opt);
+            });
+
+            barbers.forEach(b => {
+                if (b.status === 'Aktif') {
+                    const opt = document.createElement('option');
+                    opt.value = b.id;
+                    opt.textContent = b.name;
+                    bSelect.appendChild(opt);
+                }
+            });
+        }
+
+        // 1. Tambah Antrean Langsung (Walk-in)
+        function handleDirectQueue(e) {
+            e.preventDefault();
+            const name = document.getElementById('directName').value.trim();
+            const phone = document.getElementById('directPhone').value.trim();
+            const serviceId = document.getElementById('directService').value;
+            const barberId = document.getElementById('directBarber').value;
+
+            const services = JSON.parse(localStorage.getItem('walla_services')) || [];
+            const barbers = JSON.parse(localStorage.getItem('walla_barbers')) || [];
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+
+            const selectedService = services.find(s => s.id === serviceId);
+            const selectedBarber = barbers.find(b => b.id === barberId);
+
+            const today = new Date().toISOString().split('T')[0];
+            const totalToday = bookings.filter(b => b.date === today).length;
+            const queueNumber = `A-${String(totalToday + 1).padStart(3, '0')}`;
+            const bookingCode = `WLB-DIR-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            const newBooking = {
+                code: bookingCode,
+                queueNumber: queueNumber,
+                customerName: name,
+                customerPhone: phone,
+                serviceId: serviceId,
+                serviceName: selectedService.name,
+                price: selectedService.price,
+                barberId: barberId,
+                barberName: selectedBarber.name,
+                date: today,
+                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                status: 'Menunggu',
+                type: 'Langsung', // Jenis antrean: Langsung
+                paymentStatus: 'Belum Dibayar',
+                createdAt: new Date().toISOString()
+            };
+
+            bookings.push(newBooking);
+            localStorage.setItem('walla_bookings', JSON.stringify(bookings));
+
+            alert(`Antrean Langsung Berhasil Dibuat!\nNomor Antrean: ${queueNumber}`);
+            document.getElementById('directQueueForm').reset();
+            loadCombinedQueue();
+        }
+
+        // 2. Render Tabel Antrean Gabungan
+        function loadCombinedQueue() {
+            const tbody = document.getElementById('combinedQueueTable');
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+
+            if (bookings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Belum ada data.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(b => `
+                <tr>
+                    <td><strong>${b.queueNumber}</strong></td>
+                    <td>${b.customerName}</td>
+                    <td><span style="color: ${b.type === 'Langsung' ? '#17a2b8' : 'var(--accent-gold)'}; font-weight: 600;">${b.type || 'Online'}</span></td>
+                    <td>${b.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 3. Render Tabel Antrean Selesai Dilayani (Siap Dibayar)
+        function loadCompletedQueue() {
+            const tbody = document.getElementById('completedQueueTable');
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            
+            // Filter hanya yang statusnya Selesai dan Belum Dibayar
+            const readyToPay = bookings.filter(b => b.status === 'Selesai' && b.paymentStatus === 'Belum Dibayar');
+
+            if (readyToPay.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Belum ada antrean selesai dilayani.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = readyToPay.map(b => `
+                <tr class="clickable" onclick="selectForPayment('${b.code}', this)" id="pay-${b.code}">
+                    <td><strong>${b.queueNumber}</strong></td>
+                    <td>${b.customerName}</td>
+                    <td>${b.serviceName}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. Pilih Antrean untuk Dibayar
+        function selectForPayment(code, element) {
+            document.querySelectorAll('#completedQueueTable tr').forEach(tr => tr.classList.remove('selected'));
+            element.classList.add('selected');
+
+            selectedPaymentCode = code;
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            const selected = bookings.find(b => b.code === code);
+
+            if (selected) {
+                document.getElementById('paymentDetails').innerHTML = `
+                    <p><strong>Pelanggan:</strong> ${selected.customerName}</p>
+                    <p><strong>Layanan:</strong> ${selected.serviceName}</p>
+                    <p><strong>Barber:</strong> ${selected.barberName}</p>
+                `;
+                document.getElementById('billAmount').textContent = `Rp ${selected.price.toLocaleString('id-ID')}`;
+                document.getElementById('paymentActionBox').style.display = 'block';
+            }
+        }
+
+        // 5. Simpan Transaksi Pembayaran
+        function processPayment() {
+            if (!selectedPaymentCode) return;
+
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            let bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            let transactions = JSON.parse(localStorage.getItem('walla_transactions')) || [];
+
+            const index = bookings.findIndex(b => b.code === selectedPaymentCode);
+            if (index !== -1) {
+                bookings[index].paymentStatus = 'Lunas';
+                bookings[index].paymentMethod = method;
+
+                // Buat data transaksi untuk laporan
+                const newTransaction = {
+                    id: `TRX-${Date.now()}`,
+                    bookingCode: bookings[index].code,
+                    customerName: bookings[index].customerName,
+                    serviceName: bookings[index].serviceName,
+                    amount: bookings[index].price,
+                    method: method,
+                    date: new Date().toISOString().split('T')[0],
+                    time: new Date().toLocaleTimeString('id-ID')
+                };
+
+                transactions.push(newTransaction);
+
+                localStorage.setItem('walla_bookings', JSON.stringify(bookings));
+                localStorage.setItem('walla_transactions', JSON.stringify(transactions));
+
+                alert(`Pembayaran Berhasil Disimpan!\nMetode: ${method}\nTotal: Rp ${bookings[index].price.toLocaleString('id-ID')}`);
+
+                // Reset tampilan
+                selectedPaymentCode = null;
+                document.getElementById('paymentActionBox').style.display = 'none';
+                document.getElementById('paymentDetails').textContent = 'Pilih salah satu antrean yang selesai dilayani pada tabel di samping untuk diproses pembayarannya.';
+                
+                loadCompletedQueue();
+            }
+        }
+    </script>
+</body>
+</html>

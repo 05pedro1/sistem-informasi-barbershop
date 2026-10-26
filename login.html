@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Pengguna Internal - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .login-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .form-control:focus {
+            outline: 1px solid var(--accent-gold);
+        }
+        .login-hints {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">WALLA<span>BARBERSHOP</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="layanan.html">Layanan</a></li>
+                <li><a href="antrean.html">Antrean</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-primary active">Login</a>
+                <a href="booking.html" class="btn btn-outline">Booking Sekarang</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Konten Utama Login -->
+    <div class="login-wrapper">
+        <div class="login-card">
+            <h2>Login Pengguna Internal</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-top: 1rem;">Masuk</button>
+            </form>
+
+            <div class="login-hints">
+                Barber · Kasir · Pengelola (Admin)
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container" style="padding: 0;">
+            <h3>WALLA BARBERSHOP</h3>
+            <p>Jl. Melati No. 45, Kota Situbondo | Telepon: 0812-3456-7890</p>
+            <p>&copy; 2026 WALLA BARBERSHOP. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript untuk simulasi login -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim().toLowerCase();
+            
+            // Simulasi hak akses berdasarkan username sederhana
+            if (user.includes('barber')) {
+                alert('Login berhasil sebagai Barber!');
+                window.location.href = 'barber.html';
+            } else if (user.includes('kasir')) {
+                alert('Login berhasil sebagai Kasir!');
+                window.location.href = 'kasir.html';
+            } else if (user.includes('admin') || user.includes('pengelola')) {
+                alert('Login berhasil sebagai Admin/Pengelola!');
+                window.location.href = 'admin.html';
+            } else {
+                alert('Username tidak dikenali. Coba gunakan kata kunci: "barber", "kasir", atau "admin".');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemantauan Antrean - WALLA BARBERSHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .queue-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .current-serving-card {
+            background: linear-gradient(135deg, #252525, #1e1e1e);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+        }
+        .big-queue-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin: 0.5rem 0;
+            letter-spacing: 2px;
+        }
+        .search-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .search-box input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .search-box input:focus {
+            outline: 1px solid var(--accent-gold);
+        }
+        .queue-table-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        th {
+            background-color: var(--bg-secondary);
+        }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-menunggu { background-color: #ffc107; color: #000; }
+        .badge-dipanggil { background-color: #17a2b8; color: #fff; }
+        .badge-dilayani { background-color: #28a745; color: #fff; }
+        .badge-selesai { background-color: #6c757d; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">WALLA<span>BARBERSHOP</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="layanan.html">Layanan</a></li>
+                <li><a href="antrean.html" class="active">Antrean</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="booking.html" class="btn btn-primary">Booking Sekarang</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Konten Utama Pemantauan Antrean -->
+    <section class="container queue-wrapper">
+        <div class="section-title">
+            <h2>Pemantauan Antrean Real-Time</h2>
+            <p>Pantau nomor antrean yang sedang dilayani secara langsung hari ini</p>
+        </div>
+
+        <!-- Kartu Antrean yang Sedang Aktif / Dilayani -->
+        <div class="current-serving-card">
+            <p style="color: var(--text-muted); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Nomor Antrean Sedang Dilayani</p>
+            <div class="big-queue-number" id="currentServingNum">-</div>
+            <p id="currentServingDetails" style="font-size: 1.1rem; color: var(--text-primary); font-weight: 500;">Silakan bersiap di area kursi tunggu</p>
+        </div>
+
+        <!-- Pencarian Kode Booking / No Telepon -->
+        <div class="search-box">
+            <input type="text" id="searchKeyword" placeholder="Cari berdasarkan Kode Booking (contoh: WLB-...) atau No. HP...">
+            <button onclick="searchQueue()" class="btn btn-primary">Cek Antrean Saya</button>
+        </div>
+
+        <div id="searchResult" style="margin-bottom: 2rem;"></div>
+
+        <!-- Tabel Daftar Semua Antrean Hari Ini -->
+        <div class="queue-table-container">
+            <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Daftar Seluruh Antrean Hari Ini</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No. Antrean</th>
+                            <th>Nama Pelanggan</th>
+                            <th>Layanan</th>
+                            <th>Barber</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allQueuesTable">
+                        <!-- Dimuat otomatis via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
+                * Estimasi waktu tunggu merupakan perkiraan dan dapat berubah sesuai kondisi pelayanan di lokasi.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container" style="padding: 0;">
+            <h3>WALLA BARBERSHOP</h3>
+            <p>Jl. Melati No. 45, Kota Situbondo | Telepon: 0812-3456-7890</p>
+            <p>&copy; 2026 WALLA BARBERSHOP. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Pemantauan Antrean -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQueueStatus();
+        });
+
+        function loadQueueStatus() {
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+            const tbody = document.getElementById('allQueuesTable');
+            const currentNumEl = document.getElementById('currentServingNum');
+            const currentDetailsEl = document.getElementById('currentServingDetails');
+
+            if (bookings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Belum ada antrean hari ini.</td></tr>`;
+                currentNumEl.textContent = "---";
+                currentDetailsEl.textContent = "Belum ada antrean aktif";
+                return;
+            }
+
+            // Cari antrean yang sedang dilayani atau dipanggil
+            const activeQueue = bookings.find(b => b.status === 'Sedang Dilayani' || b.status === 'Dipanggil');
+            if (activeQueue) {
+                currentNumEl.textContent = activeQueue.queueNumber;
+                currentDetailsEl.textContent = `${activeQueue.customerName} - Layanan: ${activeQueue.serviceName} (${activeQueue.barberName})`;
+            } else {
+                currentNumEl.textContent = "Istirahat";
+                currentDetailsEl.textContent = "Menunggu panggilan antrean berikutnya";
+            }
+
+            // Render tabel keseluruhan
+            tbody.innerHTML = bookings.map(b => `
+                <tr>
+                    <td><strong>${b.queueNumber}</strong></td>
+                    <td>${b.customerName}</td>
+                    <td>${b.serviceName}</td>
+                    <td>${b.barberName}</td>
+                    <td><span class="badge badge-${getStatusClass(b.status)}">${b.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Menunggu': return 'menunggu';
+                case 'Dipanggil': return 'dipanggil';
+                case 'Sedang Dilayani': return 'dilayani';
+                case 'Selesai': return 'selesai';
+                default: return 'menunggu';
+            }
+        }
+
+        function searchQueue() {
+            const keyword = document.getElementById('searchKeyword').value.trim().toLowerCase();
+            const resultBox = document.getElementById('searchResult');
+            const bookings = JSON.parse(localStorage.getItem('walla_bookings')) || [];
+
+            if (!keyword) {
+                resultBox.innerHTML = "";
+                return;
+            }
+
+            const found = bookings.filter(b => b.code.toLowerCase().includes(keyword) || b.customerPhone.includes(keyword));
+
+            if (found.length === 0) {
+                resultBox.innerHTML = `<div style="background: var(--bg-card); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color); color: var(--danger);">Antrean dengan kode atau nomor tersebut tidak ditemukan.</div>`;
+                return;
+            }
+
+            resultBox.innerHTML = found.map(b => `
+                <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 6px; border: 1px solid var(--accent-gold); margin-bottom: 0.75rem;">
+                    <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Hasil Pencarian: ${b.queueNumber}</h4>
+                    <p><strong>Nama:</strong> ${b.customerName} | <strong>Layanan:</strong> ${b.serviceName}</p>
+                    <p><strong>Barber:</strong> ${b.barberName} | <strong>Status:</strong> <span style="color: #28a745; font-weight: bold;">${b.status}</span></p>
+                    <p><strong>Kode Booking:</strong> ${b.code}</p>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
